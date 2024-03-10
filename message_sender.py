@@ -3,6 +3,7 @@ from flask import Response
 from firebase_functions import send_message
 from storage_manager import MessageStorage
 
+import time
 
 message_storage = MessageStorage()
 
@@ -29,7 +30,9 @@ def send_text_message(user_data, recipient, message_data):
     # Send the message to the recipient
     send_message(recipient['messaging_token'], data=data)
 
-    message_storage.add_message(user_data, recipient, "text", message_data)
+    # Save the message to the storage
+    message_time = round(time.time() * 1000)
+    message_storage.add_message(user_data, recipient, "text", message_data, message_time)
 
     return Response(status=200)
 

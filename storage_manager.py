@@ -48,13 +48,13 @@ class UserStorage:
     
 
     def load(self):
-        with open(USER_STORAGE_FILE, "r") as file:
+        with open(USER_STORAGE_FILE, "r", encoding="utf-8") as file:
             data = json.load(file)
             self.users = data["users"]
             self.api_keys = data["api_keys"]
     
     def save(self):
-        with open(USER_STORAGE_FILE, "w") as file:
+        with open(USER_STORAGE_FILE, "w", encoding="utf-8") as file:
             data = {
                 "users": self.users,
                 "api_keys": self.api_keys
@@ -66,26 +66,76 @@ class MessageStorage:
     def __init__(self):
         self.messages = []
 
-    def add_message(self, sender, recipient, message_type, message_data):
+    def add_message(self, sender, recipient, message_type, message_data, message_time):
         self.load()
 
-        message = self.get_message_dict(sender["uid"], recipient["uid"], message_type, message_data)
+        message = self.get_message_dict(sender["uid"], recipient["uid"], message_type, message_data, message_time)
         self.messages.append(message)
 
         self.save()
 
-    def get_message_dict(self, sender_id, recipient_id, message_type, message_data):
+    def get_message_dict(self, sender_id, recipient_id, message_type, message_data, message_time):
         return {
             "sender_id": sender_id,
             "recipient_id": recipient_id,
             "message_type": message_type,
-            "message": message_data
+            "message": message_data,
+            "time": message_time
         }
 
     def load(self):
-        with open(MESSAGE_STORAGE_FILE, "r") as file:
+        with open(MESSAGE_STORAGE_FILE, "r", encoding="utf-8") as file:
             self.messages = json.load(file)
     
     def save(self):
-        with open(MESSAGE_STORAGE_FILE, "w") as file:
+        with open(MESSAGE_STORAGE_FILE, "w", encoding="utf-8") as file:
             json.dump(self.messages, file, indent=2)
+
+
+    def get_chats(self, user_id, limit=100):
+        self.load()
+
+        chats = {}
+
+        for message in self.messages:
+            if message["sender_id"] == user_id or message["recipient_id"] == user_id:
+                if message["sender_id"] == user_id:
+                    partner_id = message["recipient_id"]
+                else:
+                    partner_id = message["sender_id"]
+
+
+                if partner_id in chats and message["time"] <= chats[partner_id]["last_message_time"]:
+                    continue
+
+
+                chat = {}
+                
+                partner = UserStorage().get_user(partner_id)
+                chat["partner_name"] = partner["name"]
+                chat["partner_email"] = partner["email"]
+                chat["partner_picture"] = partner["picture"]
+                chat["last_message_time"] = message["time"]
+                # chat["last_message"] = message["message"]
+
+                chats[partner_id] = chat
+
+        chats = dict(sorted(chats.items(), key=lambda item: item[1]['last_message_time'], reverse=True))
+
+        return list(chats.values())[:min(limit, len(chats))]
+    
+    
+    def get_messages(self, user_id, recipient_id, limit=100):
+        self.load()
+
+        messages = []
+        for message in self.messages:
+            if message["sender_id"] == user_id and message["recipient_id"] == recipient_id:
+                messages.append(message)
+            elif message["sender_id"] == recipient_id and message["recipient_id"] == user_id:
+                messages.append(message)
+        
+        #sort by time descending
+        messages.sort(key=lambda x: x["time"], reverse=True)
+
+        return messages[:min(limit, len(messages))]

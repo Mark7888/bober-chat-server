@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, Response
 from flask_sock import Sock
 
 from firebase_functions import do_auth, send_message, generate_local_api_key
-from message_sender import get_message_error, send_text_message
+from message_sender import message_storage, get_message_error, send_text_message
 from storage_manager import UserStorage, MessageStorage
 
 app = Flask(__name__)
@@ -61,6 +61,45 @@ def send_message_to_user():
         return send_text_message(user_data, recipient, messageData)
 
     return get_message_error(418, "Message type not supported")
+
+
+# This is the endpoint that the client will use to get the chats sent to them
+@app.route('/get_chats', methods=['GET'])
+def get_chats():
+    api_key = request.args['apiKey']
+
+    # Authenticate the user
+    user_data = user_storage.get_user_by_api_key(api_key)
+    if user_data is None:
+        return Response(status=401)
+
+    # Get the messages
+    messages = message_storage.get_chats(user_data["user_id"])
+
+    return Response(status=200, content_type="application/json", response=messages)
+
+
+# This is the endpoint that the client will use to get the message with a specific user
+@app.route('/get_messages', methods=['GET'])
+def get_messages():
+    api_key = request.args['apiKey']
+    recipient_email = request.args['recipientEmail']
+
+    # Authenticate the user
+    user_data = user_storage.get_user_by_api_key(api_key)
+    if user_data is None:
+        return Response(status=401)
+
+    # Get the recipient user data
+    recipient = user_storage.get_user_by_email(recipient_email)
+
+    if recipient is None:
+        return get_message_error(404, "Recipient not found")
+
+    # Get the messages
+    messages = message_storage.get_messages(user_data["user_id"], recipient["user_id"])
+
+    return Response(status=200, content_type="application/json", response=messages)
 
 
 if __name__ == '__main__':
