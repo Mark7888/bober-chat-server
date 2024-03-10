@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 
 serviceAccountKey.json
+data/*
+!data/.gitkeep
