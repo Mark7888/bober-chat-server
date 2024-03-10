@@ -48,6 +48,11 @@ class UserStorage:
     
 
     def load(self):
+        if not os.path.exists(USER_STORAGE_FILE):
+            self.users = {}
+            self.api_keys = {}
+            return
+
         with open(USER_STORAGE_FILE, "r", encoding="utf-8") as file:
             data = json.load(file)
             self.users = data["users"]
@@ -66,10 +71,10 @@ class MessageStorage:
     def __init__(self):
         self.messages = []
 
-    def add_message(self, sender, recipient, message_type, message_data, message_time):
+    def add_message(self, sender_id, recipient_id, message_type, message_data, message_time):
         self.load()
 
-        message = self.get_message_dict(sender["uid"], recipient["uid"], message_type, message_data, message_time)
+        message = self.get_message_dict(sender_id, recipient_id, message_type, message_data, message_time)
         self.messages.append(message)
 
         self.save()
@@ -84,6 +89,11 @@ class MessageStorage:
         }
 
     def load(self):
+        if not os.path.exists(MESSAGE_STORAGE_FILE):
+            print("No message storage file found")
+            self.messages = []
+            return
+        
         with open(MESSAGE_STORAGE_FILE, "r", encoding="utf-8") as file:
             self.messages = json.load(file)
     

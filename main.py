@@ -5,6 +5,8 @@ from firebase_functions import do_auth, send_message, generate_local_api_key
 from message_sender import message_storage, get_message_error, send_text_message
 from storage_manager import UserStorage, MessageStorage
 
+import json
+
 app = Flask(__name__)
 sock = Sock(app)
 
@@ -74,9 +76,11 @@ def get_chats():
         return Response(status=401)
 
     # Get the messages
-    messages = message_storage.get_chats(user_data["user_id"])
+    chats = message_storage.get_chats(user_data["user_id"])
 
-    return Response(status=200, content_type="application/json", response=messages)
+    print(chats)
+
+    return json.dumps(chats), 200, {'Content-Type': 'application/json'}
 
 
 # This is the endpoint that the client will use to get the message with a specific user
@@ -99,7 +103,7 @@ def get_messages():
     # Get the messages
     messages = message_storage.get_messages(user_data["user_id"], recipient["user_id"])
 
-    return Response(status=200, content_type="application/json", response=messages)
+    return json.dumps(messages), 200, {'Content-Type': 'application/json'}
 
 
 if __name__ == '__main__':
