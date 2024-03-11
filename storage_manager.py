@@ -155,7 +155,13 @@ class MessageStorage:
         #sort by time descending
         messages.sort(key=lambda x: x["time"], reverse=True)
 
-        return messages[:min(limit, len(messages))]
+        # cut messages length by limit
+        messages = messages[:min(limit, len(messages))]
+
+        #sort by time ascending
+        messages.sort(key=lambda x: x["time"])
+
+        return messages
 
 def generate_message_id(sender_id, recipient_id):
     combined_string = str(time.time()) + sender_id + recipient_id
