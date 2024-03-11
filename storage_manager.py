@@ -146,8 +146,10 @@ class MessageStorage:
         messages = []
         for message in self.messages:
             if message["sender_id"] == user_id and message["recipient_id"] == recipient_id:
+                message["is_sent"] = True
                 messages.append(message)
             elif message["sender_id"] == recipient_id and message["recipient_id"] == user_id:
+                message["is_sent"] = False
                 messages.append(message)
 
         #sort by time descending
