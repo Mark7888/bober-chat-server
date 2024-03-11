@@ -1,5 +1,7 @@
 import json
 import os
+import time
+import hashlib
 
 USER_STORAGE_FILE = "data/users.json"
 MESSAGE_STORAGE_FILE = "data/messages.json"
@@ -31,21 +33,21 @@ class UserStorage:
         self.load()
 
         return self.users[user_id]
-    
+
     def get_user_by_email(self, email):
         self.load()
 
         for user in self.users.values():
             if user["email"] == email:
                 return user
-        
+
         return None
-    
+
     def get_user_by_api_key(self, api_key):
         self.load()
 
         return self.users[self.api_keys[api_key]]
-    
+
 
     def load(self):
         if not os.path.exists(USER_STORAGE_FILE):
@@ -57,7 +59,7 @@ class UserStorage:
             data = json.load(file)
             self.users = data["users"]
             self.api_keys = data["api_keys"]
-    
+
     def save(self):
         with open(USER_STORAGE_FILE, "w", encoding="utf-8") as file:
             data = {
@@ -80,7 +82,10 @@ class MessageStorage:
         self.save()
 
     def get_message_dict(self, sender_id, recipient_id, message_type, message_data, message_time):
+        id = generate_message_id(sender_id, recipient_id)
+
         return {
+            "id": id,
             "sender_id": sender_id,
             "recipient_id": recipient_id,
             "message_type": message_type,
@@ -93,10 +98,10 @@ class MessageStorage:
             print("No message storage file found")
             self.messages = []
             return
-        
+
         with open(MESSAGE_STORAGE_FILE, "r", encoding="utf-8") as file:
             self.messages = json.load(file)
-    
+
     def save(self):
         with open(MESSAGE_STORAGE_FILE, "w", encoding="utf-8") as file:
             json.dump(self.messages, file, indent=2)
@@ -120,7 +125,7 @@ class MessageStorage:
 
 
                 chat = {}
-                
+
                 partner = UserStorage().get_user(partner_id)
                 chat["partner_name"] = partner["name"]
                 chat["partner_email"] = partner["email"]
@@ -133,8 +138,8 @@ class MessageStorage:
         chats = dict(sorted(chats.items(), key=lambda item: item[1]['last_message_time'], reverse=True))
 
         return list(chats.values())[:min(limit, len(chats))]
-    
-    
+
+
     def get_messages(self, user_id, recipient_id, limit=100):
         self.load()
 
@@ -144,8 +149,13 @@ class MessageStorage:
                 messages.append(message)
             elif message["sender_id"] == recipient_id and message["recipient_id"] == user_id:
                 messages.append(message)
-        
+
         #sort by time descending
         messages.sort(key=lambda x: x["time"], reverse=True)
 
         return messages[:min(limit, len(messages))]
+
+def generate_message_id(sender_id, recipient_id):
+    combined_string = str(time.time()) + sender_id + recipient_id
+    hashed_string = hashlib.sha256(combined_string.encode()).hexdigest()
+    return hashed_string
