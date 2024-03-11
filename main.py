@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, Response
-from flask_sock import Sock
 
 from firebase_functions import do_auth, send_message, generate_local_api_key
 from message_sender import message_storage, get_message_error, send_text_message
@@ -8,7 +7,6 @@ from storage_manager import UserStorage, MessageStorage
 import json
 
 app = Flask(__name__)
-sock = Sock(app)
 
 # Initialize storage manager objects
 user_storage = UserStorage()
@@ -33,7 +31,7 @@ def authenticate():
 
     # Save the user to the storage
     user_storage.add_user(user_data, messaging_token, local_api_key)
-    
+
     # send the local api key to the client
     send_message(messaging_token, data={"auth_ack": "true", "api_key": local_api_key})
 
