@@ -115,7 +115,12 @@ def get_user():
 
     targetUserData = user_storage.get_user_by_email(userEmail)
 
-    return json.dumps(targetUserData), 200, {'Content-Type': 'application/json'}
+    data = {}
+    data['name'] = targetUserData['name']
+    data['email'] = targetUserData['email']
+    data['picture'] = targetUserData['picture']
+
+    return json.dumps(data), 200, {'Content-Type': 'application/json'}
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8088, debug=True)
