@@ -103,6 +103,19 @@ def get_messages():
 
     return json.dumps(messages), 200, {'Content-Type': 'application/json'}
 
+@app.route('/get_user', methods=['GET'])
+def get_user():
+    api_key = request.args['apiKey']
+    userEmail = request.args['userEmail']
+
+    # Authenticate the user
+    user_data = user_storage.get_user_by_api_key(api_key)
+    if user_data is None:
+        return Response(status=401)
+
+    targetUserData = user_storage.get_user_by_email(userEmail)
+
+    return json.dumps(targetUserData), 200, {'Content-Type': 'application/json'}
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8088, debug=True)
