@@ -1,7 +1,7 @@
 from flask import Response
 
 from firebase_functions import send_message
-from storage_manager import MessageStorage
+from storage_manager import MessageStorage, generate_message_id
 
 import time
 
@@ -24,7 +24,8 @@ def send_text_message(user_data, recipient, message_data):
         "message": message_data,
         "senderName": user_data['name'],
         "senderEmail" : user_data['email'],
-        "senderPicture": user_data['picture']
+        "senderPicture": user_data['picture'],
+        "id": generate_message_id(user_data['user_id'], recipient['user_id'])
     }
 
     # Send the message to the recipient
