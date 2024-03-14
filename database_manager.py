@@ -74,13 +74,13 @@ class UserManager:
         print(user_data)
 
     def get_user_by_api_key(self, api_key):
-        self.cursor.execute("SELECT * FROM ApiKeys WHERE ApiKey=%s", (api_key,))
+        now = datetime.now()
+        now_string = now.strftime("%Y-%m-%d %H:%M:%S")
+        self.cursor.execute("SELECT * FROM ApiKeys WHERE ApiKey=%s AND Expiration>=%s", (api_key, now_string,))
         api_key_data = self.cursor.fetchone()
 
-        # check if not expired
-        # strftime("%Y-%m-%d %H:%M:%S")
         print(api_key_data)
-        if api_key_data and datetime.strptime(api_key_data[2], "%Y-%m-%d %H:%M:%S") > datetime.now():
+        if api_key_data:
             self.cursor.execute("SELECT * FROM Users WHERE UserId=%s", (api_key_data[1],))
             user_data = self.cursor.fetchone()
             print(user_data)
