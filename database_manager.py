@@ -193,7 +193,7 @@ class MessageStorage:
 
         messages = []
         for row in rows:
-            is_sent = True if row[0] == user_id else False
+            is_sent = True if row[1] == user_id else False
             message = {
                 "id": row[0],
                 "sender_id": row[1],
