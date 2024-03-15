@@ -177,7 +177,7 @@ class MessageStorage:
     def get_messages(self, user_id, recipient_id, limit=100):
         query = f"""
             SELECT 
-                SenderId, RecipientId, MessageType, Message, Timestamp
+                MessageId, SenderId, RecipientId, MessageType, Message, Timestamp
             FROM 
                 Messages
             WHERE 
@@ -195,11 +195,12 @@ class MessageStorage:
         for row in rows:
             is_sent = True if row[0] == user_id else False
             message = {
-                "sender_id": row[0],
-                "recipient_id": row[1],
-                "message_type": row[2],
-                "message": b64decode(row[3]).decode(),
-                "time": int(row[4].timestamp() * 1000),
+                "id": row[0],
+                "sender_id": row[1],
+                "recipient_id": row[2],
+                "message_type": row[3],
+                "message": b64decode(row[4]).decode(),
+                "time": int(row[5].timestamp() * 1000),
                 "is_sent": is_sent
             }
             messages.append(message)
