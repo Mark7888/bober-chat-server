@@ -31,7 +31,7 @@ def send_message(tokens, data=None, notification=None):
         tokens=tokens,
     )
 
-    response = messaging.send(message)
+    response = messaging.send_multicast(message)
     print('Successfully sent message:', response)
 
 def generate_local_api_key(id_token, user_email):
