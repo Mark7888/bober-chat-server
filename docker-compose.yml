@@ -4,6 +4,19 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
+    restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "8088:8088"
-
+    depends_on:
+      - db
+  db:
+    image: 'mariadb:latest'
+    restart: unless-stopped
+    ports:
+      - "3366:3306"
+    env_file:
+      - .env
+    volumes:
+      - /var/lib/bober-chat/mysql:/var/lib/mysql

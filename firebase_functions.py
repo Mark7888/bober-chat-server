@@ -24,14 +24,14 @@ def do_auth(token):
     return decoded_token
 
 
-def send_message(token, data=None, notification=None):
-    message = messaging.Message(
+def send_message(tokens, data=None, notification=None):
+    message = messaging.MulticastMessage(
         data=data,
         notification=notification,
-        token=token,
+        tokens=tokens,
     )
 
-    response = messaging.send(message)
+    response = messaging.send_multicast(message)
     print('Successfully sent message:', response)
 
 def generate_local_api_key(id_token, user_email):

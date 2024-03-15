@@ -1,15 +1,15 @@
 from flask import Flask, render_template, request, Response
 
 from firebase_functions import do_auth, send_message, generate_local_api_key
-from message_sender import message_storage, get_message_error, send_text_message
-from storage_manager import UserStorage, MessageStorage
+from message_sender import database_manager, message_storage, get_message_error, send_text_message
+from database_manager import UserManager
 
 import json
 
 app = Flask(__name__)
 
 # Initialize storage manager objects
-user_storage = UserStorage()
+user_storage = UserManager(database_manager)
 
 
 # This is the server health check endpoint
@@ -33,7 +33,7 @@ def authenticate():
     user_storage.add_user(user_data, messaging_token, local_api_key)
 
     # send the local api key to the client
-    send_message(messaging_token, data={"auth_ack": "true", "api_key": local_api_key})
+    send_message([messaging_token], data={"auth_ack": "true", "api_key": local_api_key})
 
     return Response(status=200)
 
@@ -57,8 +57,10 @@ def send_message_to_user():
     if recipient is None:
         return get_message_error(404, "Recipient not found")
 
+    recipient_messaging_tokens = user_storage.get_messaging_tokens(recipient["user_id"])
+
     if messageType == "text":
-        return send_text_message(user_data, recipient, messageData)
+        return send_text_message(user_data, recipient, recipient_messaging_tokens, messageData)
 
     return get_message_error(418, "Message type not supported")
 
@@ -75,8 +77,6 @@ def get_chats():
 
     # Get the messages
     chats = message_storage.get_chats(user_data["user_id"])
-
-    print(chats)
 
     return json.dumps(chats), 200, {'Content-Type': 'application/json'}
 
