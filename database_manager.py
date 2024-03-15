@@ -206,6 +206,6 @@ class MessageStorage:
             messages.append(message)
 
         # Sort messages by time descending
-        messages.sort(key=lambda x: x["time"], reverse=True)
+        messages.sort(key=lambda x: x["time"], reverse=False)
 
         return messages
