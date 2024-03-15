@@ -33,7 +33,7 @@ def authenticate():
     user_storage.add_user(user_data, messaging_token, local_api_key)
 
     # send the local api key to the client
-    send_message(messaging_token, data={"auth_ack": "true", "api_key": local_api_key})
+    send_message([messaging_token], data={"auth_ack": "true", "api_key": local_api_key})
 
     return Response(status=200)
 
