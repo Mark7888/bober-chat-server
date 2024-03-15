@@ -76,8 +76,6 @@ def get_chats():
     # Get the messages
     chats = message_storage.get_chats(user_data["user_id"])
 
-    print(chats)
-
     return json.dumps(chats), 200, {'Content-Type': 'application/json'}
 
 
