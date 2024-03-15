@@ -1,15 +1,15 @@
 from flask import Flask, render_template, request, Response
 
 from firebase_functions import do_auth, send_message, generate_local_api_key
-from message_sender import message_storage, get_message_error, send_text_message
-from storage_manager import UserStorage, MessageStorage
+from message_sender import database_manager, message_storage, get_message_error, send_text_message
+from database_manager import UserManager
 
 import json
 
 app = Flask(__name__)
 
 # Initialize storage manager objects
-user_storage = UserStorage()
+user_storage = UserManager(database_manager)
 
 
 # This is the server health check endpoint
