@@ -10,6 +10,7 @@ load_dotenv()
 
 
 MYSQL_HOST = getenv("MYSQL_HOST")
+MYSQL_PORT = getenv("MYSQL_PORT")
 MYSQL_USER = getenv("MYSQL_USER")
 MYSQL_PASSWORD = getenv("MYSQL_PASSWORD")
 MYSQL_DATABASE = getenv("MYSQL_DATABASE")
@@ -18,6 +19,7 @@ class DatabaseManager:
     def __init__(self):
         self.connection = dbconnect(
             host=MYSQL_HOST,
+            port=MYSQL_PORT,
             user=MYSQL_USER,
             password=MYSQL_PASSWORD,
             database=MYSQL_DATABASE
