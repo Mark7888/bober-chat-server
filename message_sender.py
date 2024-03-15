@@ -19,7 +19,10 @@ def get_message_error(code, message):
 
 
 # This function sends a text message to the recipient
-def send_text_message(user_data, recipient, message_data):
+def send_text_message(user_data, recipient, recipient_messaging_tokens, message_data):
+    if len(recipient_messaging_tokens) == 0:
+        return get_message_error(404, "Recipient has no messaging tokens")
+    
     data = {
         "messageType": "text",
         "message": message_data,
@@ -29,7 +32,7 @@ def send_text_message(user_data, recipient, message_data):
     }
 
     # Send the message to the recipient
-    send_message(recipient['messaging_token'], data=data)
+    send_message(recipient_messaging_tokens, data=data)
 
     # Save the message to the storage
     message_time = datetime.now()

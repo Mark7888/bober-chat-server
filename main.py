@@ -57,8 +57,10 @@ def send_message_to_user():
     if recipient is None:
         return get_message_error(404, "Recipient not found")
 
+    recipient_messaging_tokens = user_storage.get_messaging_tokens(recipient["user_id"])
+
     if messageType == "text":
-        return send_text_message(user_data, recipient, messageData)
+        return send_text_message(user_data, recipient, recipient_messaging_tokens, messageData)
 
     return get_message_error(418, "Message type not supported")
 

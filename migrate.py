@@ -17,7 +17,7 @@ for user_id in users:
         "name": users[user_id]["name"],
         "picture": users[user_id]["picture"]
     }
-    user_manager.add_user(u, None, None)
+    user_manager.add_user(u, users[user_id]["messaging_token"], None)    
 
 with open("data/messages.json", "r", encoding="utf-8") as file:
     messages = json.load(file)
