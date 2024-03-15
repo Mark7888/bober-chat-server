@@ -4,6 +4,8 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
+    env_file:
+      - .env
     ports:
       - "8088:8088"
     depends_on:

@@ -64,9 +64,9 @@ class UserManager:
         self.cursor.execute("INSERT INTO Users (UserId, Email, Name, PictureUrl) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE Name = VALUES(Name), PictureUrl = VALUES(PictureUrl), Email = VALUES(Email)", (user["uid"], user["email"], user["name"], user["picture"]))
         
         if api_key:
-            self.cursor.execute("INSERT INTO ApiKeys (ApiKey, UserId, Expiration) VALUES (%s, %s, %s)", (api_key, user["uid"], expiration_string))
+            self.cursor.execute("INSERT IGNORE INTO ApiKeys (ApiKey, UserId, Expiration) VALUES (%s, %s, %s)", (api_key, user["uid"], expiration_string))
         if messaging_token:
-            self.cursor.execute("INSERT INTO MessagingTokens (MessagingToken, UserId, Expiration) VALUES (%s, %s, %s)", (messaging_token, user["uid"], expiration_string))
+            self.cursor.execute("INSERT IGNORE INTO MessagingTokens (MessagingToken, UserId, Expiration) VALUES (%s, %s, %s)", (messaging_token, user["uid"], expiration_string))
 
         self.connection.commit()
 
