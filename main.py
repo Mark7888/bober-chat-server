@@ -66,7 +66,7 @@ def send_message_to_user():
     return get_message_error(418, "Message type not supported")
 
 # upload file from client to server as form data
-@app.route('/upload_image', methods=['GET'])
+@app.route('/upload_image', methods=['POST'])
 def upload_image():
     api_key = request.args['apiKey']
 
