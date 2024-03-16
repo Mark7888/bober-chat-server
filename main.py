@@ -80,10 +80,28 @@ def upload_image():
         return get_message_error(400, "No file uploaded")
     
     file = request.files['file']
-    file_hash = hashlib.sha256(file).hexdigest()
-    file.save(f'./uploads/images/{file_hash}.png')
 
-    return file_hash, 200, {'Content-Type': 'application/json'}
+    if file:
+        # Calculate SHA256 hash of the file
+        file_hash = hashlib.sha256()
+        while True:
+            chunk = file.stream.read(8192)
+            if not chunk:
+                break
+            file_hash.update(chunk)
+        
+        # Reset file pointer to beginning
+        file.seek(0)
+
+        # Get hex digest of the hash
+        file_hash_hex = file_hash.hexdigest()
+
+        # Save the file with the hash as the filename
+        file.save("./uploads/images/" + file_hash_hex + ".png")
+
+        return file_hash_hex, 200, {'Content-Type': 'application/json'}
+    else:
+        return get_message_error(400, "No file uploaded")
 
 
 # This is the endpoint that the client will use to get the chats sent to them
