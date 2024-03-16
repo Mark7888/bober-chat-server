@@ -162,3 +162,5 @@ cython_debug/
 serviceAccountKey.json
 data/*
 !data/.gitkeep
+uploads/images/*
+!uploads/images/.gitkeep

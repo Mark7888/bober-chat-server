@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, send_file
 
 from firebase_functions import do_auth, send_message, generate_local_api_key
 from message_sender import database_manager, message_storage, get_message_error, send_text_message
 from database_manager import UserManager
 
 import json
+import hashlib
 
 app = Flask(__name__)
 
@@ -59,10 +60,30 @@ def send_message_to_user():
 
     recipient_messaging_tokens = user_storage.get_messaging_tokens(recipient["user_id"])
 
-    if messageType == "text":
+    if messageType in ["text", "image"]:
         return send_text_message(user_data, recipient, recipient_messaging_tokens, messageData)
 
     return get_message_error(418, "Message type not supported")
+
+# upload file from client to server as form data
+@app.route('/upload_image', methods=['GET'])
+def upload_image():
+    api_key = request.args['apiKey']
+
+    # Authenticate the user
+    user_data = user_storage.get_user_by_api_key(api_key)
+
+    if user_data is None:
+        return Response(status=401)
+    
+    if 'file' not in request.files:
+        return get_message_error(400, "No file uploaded")
+    
+    file = request.files['file']
+    file_hash = hashlib.sha256(file).hexdigest()
+    file.save(f'./uploads/images/{file_hash}.png')
+
+    return file_hash, 200, {'Content-Type': 'application/json'}
 
 
 # This is the endpoint that the client will use to get the chats sent to them
@@ -121,6 +142,12 @@ def get_user():
     data['picture'] = targetUserData['picture']
 
     return json.dumps(data), 200, {'Content-Type': 'application/json'}
+
+
+@app.route('/get_image/<image_hash>', methods=['GET'])
+def get_image(image_hash):
+    return send_file(f'./uploads/images/{image_hash}.png', mimetype='image/png')
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8088, debug=True)
