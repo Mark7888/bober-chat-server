@@ -19,17 +19,17 @@ def get_message_error(code, message):
 
 
 # This function sends a text message to the recipient
-def send_text_message(user_data, recipient, recipient_messaging_tokens, message_data):
+def send_firebase_message(user_data, recipient, recipient_messaging_tokens, message_data, message_type):
     
     # Save the message to the storage
     message_time = datetime.now()
-    message_storage.add_message(user_data["user_id"], recipient["user_id"], "text", message_data, message_time)
+    message_storage.add_message(user_data["user_id"], recipient["user_id"], message_type, message_data, message_time)
 
     if len(recipient_messaging_tokens) == 0:
         return get_message_error(404, "Recipient has no messaging tokens")
     
     data = {
-        "messageType": "text",
+        "messageType": message_type,
         "message": message_data,
         "senderName": user_data['name'],
         "senderEmail" : user_data['email'],

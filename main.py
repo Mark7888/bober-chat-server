@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, Response, send_file
+from flask import Flask, request, Response, send_file
 
 from firebase_functions import do_auth, send_message, generate_local_api_key
-from message_sender import database_manager, message_storage, get_message_error, send_text_message
+from message_sender import database_manager, message_storage, get_message_error, send_firebase_message
 from database_manager import UserManager
 
 import json
@@ -61,7 +61,7 @@ def send_message_to_user():
     recipient_messaging_tokens = user_storage.get_messaging_tokens(recipient["user_id"])
 
     if messageType in ["text", "image"]:
-        return send_text_message(user_data, recipient, recipient_messaging_tokens, messageData)
+        return send_firebase_message(user_data, recipient, recipient_messaging_tokens, messageData, messageType)
 
     return get_message_error(418, "Message type not supported")
 
