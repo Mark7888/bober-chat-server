@@ -1,8 +1,8 @@
 from flask import Flask, request, Response, send_file
 
 from firebase_functions import do_auth, send_message, generate_local_api_key
-from message_sender import message_storage, get_message_error, send_firebase_message
-from database_manager import UserManager, DatabaseManager
+from message_sender import get_message_error, send_firebase_message
+from database_manager import DatabaseManager, UserManager, MessageStorage
 
 import json
 import hashlib
@@ -115,6 +115,7 @@ def get_chats():
 
     database_manager = DatabaseManager()
     user_storage = UserManager(database_manager)
+    message_storage = MessageStorage(database_manager)
     # Authenticate the user
     user_data = user_storage.get_user_by_api_key(api_key)
     if user_data is None:
@@ -134,6 +135,7 @@ def get_messages():
 
     database_manager = DatabaseManager()
     user_storage = UserManager(database_manager)
+    message_storage = MessageStorage(database_manager)
     # Authenticate the user
     user_data = user_storage.get_user_by_api_key(api_key)
     if user_data is None:
