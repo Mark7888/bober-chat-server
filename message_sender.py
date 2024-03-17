@@ -5,9 +5,6 @@ from database_manager import DatabaseManager, MessageStorage
 
 from datetime import datetime
 
-database_manager = DatabaseManager()
-message_storage = MessageStorage(database_manager)
-
 
 def get_message_error(code, message):
     data = {
@@ -20,6 +17,8 @@ def get_message_error(code, message):
 
 # This function sends a text message to the recipient
 def send_firebase_message(user_data, recipient, recipient_messaging_tokens, message_data, message_type):
+    database_manager = DatabaseManager()
+    message_storage = MessageStorage(database_manager)
     
     # Save the message to the storage
     message_time = datetime.now()
