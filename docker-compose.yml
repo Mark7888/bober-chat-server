@@ -12,7 +12,7 @@ services:
     depends_on:
       - db
     volumes:
-      - /var/lib/bober-chat/uploads:app/uploads
+      - /var/lib/bober-chat/uploads:/app/uploads
   db:
     image: 'mariadb:latest'
     restart: unless-stopped
