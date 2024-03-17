@@ -25,6 +25,9 @@ To connect the Android application to the server running on a domain, follow the
 1. **Update ConnectionHandler.kt**: In the Android application repository, navigate to the (ConnectionHandler.kt)[https://github.com/Mark7888/bober-chat-client/blob/master/app/src/main/java/me/mark7888/boberchat/ConnectionHandler.kt#L18] file.
    - Update the domain name or server URL in this file to point to your server's domain.
 
+## Database Structure
+![Database Structure](pictures/database.png)
+
 ## Dependencies
 - Python
 - Flask
