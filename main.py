@@ -4,6 +4,7 @@ from firebase_functions import do_auth, send_message, generate_local_api_key
 from message_sender import get_message_error, send_firebase_message
 from database_manager import DatabaseManager, UserManager, MessageStorage
 
+import os
 import json
 import hashlib
 
@@ -100,6 +101,9 @@ def upload_image():
         # Get hex digest of the hash
         file_hash_hex = file_hash.hexdigest()
 
+        if not os.path.exists("./uploads/images"):
+            os.makedirs("./uploads/images")
+
         # Save the file with the hash as the filename
         file.save("./uploads/images/" + file_hash_hex + ".png")
 
@@ -176,7 +180,10 @@ def get_user():
 
 @app.route('/get_image/<image_hash>', methods=['GET'])
 def get_image(image_hash):
-    return send_file(f'./uploads/images/{image_hash}.png', mimetype='image/png')
+    if os.path.exists(f'./uploads/images/{image_hash}.png'):
+        return send_file(f'./uploads/images/{image_hash}.png', mimetype='image/png')
+    
+    return get_message_error(404, "Image not found")
 
 
 if __name__ == '__main__':
