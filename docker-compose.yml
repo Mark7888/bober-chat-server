@@ -11,6 +11,8 @@ services:
       - "8088:8088"
     depends_on:
       - db
+    volumes:
+      - /var/lib/bober-chat/uploads:/var/www/html/uploads
   db:
     image: 'mariadb:latest'
     restart: unless-stopped
